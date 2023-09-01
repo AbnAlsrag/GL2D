@@ -62,21 +62,6 @@ static char* ReadFile(const char* path) {
     return buffer;
 }
 
-const GL2D_Color
-GL2D_COLOR_GOODIE = { 51, 76, 76, 255 }, GL2D_COLOR_GREY = { 192, 192, 192, 255 },
-GL2D_COLOR_DARK_GREY = { 128, 128, 128, 255 }, GL2D_COLOR_VERY_DARK_GREY = { 64, 64, 64, 255 },
-GL2D_COLOR_RED = { 255, 0, 0, 255 }, GL2D_COLOR_DARK_RED = { 128, 0, 0, 255 },
-GL2D_COLOR_VERY_DARK_RED = { 64, 0, 0, 255 }, GL2D_COLOR_YELLOW = { 255, 255, 0, 255 },
-GL2D_COLOR_DARK_YELLOW = { 128, 128, 0, 255 }, GL2D_COLOR_VERY_DARK_YELLOW = { 64, 64, 0, 255 },
-GL2D_COLOR_GREEN = { 0, 255, 0, 255 }, GL2D_COLOR_DARK_GREEN = { 0, 128, 0, 255 },
-GL2D_COLOR_VERY_DARK_GREEN = { 0, 64, 0, 255 }, GL2D_COLOR_CYAN = { 0, 255, 255, 255 },
-GL2D_COLOR_DARK_CYAN = { 0, 128, 128, 255 }, GL2D_COLOR_VERY_DARK_CYAN = { 0, 64, 64, 255 },
-GL2D_COLOR_BLUE = { 0, 0, 255, 255 }, GL2D_COLOR_DARK_BLUE = { 0, 0, 128, 255 },
-GL2D_COLOR_VERY_DARK_BLUE = { 0, 0, 64, 255 }, GL2D_COLOR_MAGENTA = { 255, 0, 255, 255 },
-GL2D_COLOR_DARK_MAGENTA = { 128, 0, 128, 255 }, GL2D_COLOR_VERY_DARK_MAGENTA = { 64, 0, 64, 255 },
-GL2D_COLOR_WHITE = { 255, 255, 255, 255 }, GL2D_COLOR_BLACK = { 0, 0, 0, 255 },
-GL2D_COLOR_BLANK = { 0, 0, 0, 0 };
-
 struct GL2D_Renderer {
     int unused;
 };
@@ -88,7 +73,7 @@ struct GL2D_Shader {
 struct GL2D_Texture {
     uint32_t id;
     uint8_t slot;
-    GL2D_Vector2F size;
+    GL2D_Vector2f size;
 };
 
 struct GL2D_VertexArray {
@@ -103,97 +88,132 @@ struct GL2D_IndexBuffer {
     uint32_t id;
 };
 
-GL2D_API bool GL2D_VecEqual(GL2D_Vector2F vector1, GL2D_Vector2F vector2) {
+GL2D_API bool GL2D_VecEqual(GL2D_Vector2f vector1, GL2D_Vector2f vector2) {
     return (vector1.x == vector2.x && vector1.y == vector2.y);
 }
 
-GL2D_API GL2D_Vector2F GL2D_VecScalarAdd(GL2D_Vector2F vector, float value) {
-    return (GL2D_Vector2F) { vector.x + value, vector.y + value };
+GL2D_API GL2D_Vector2f GL2D_VecScalarAdd(GL2D_Vector2f vector, float value) {
+    return (GL2D_Vector2f) { vector.x + value, vector.y + value };
 }
 
-GL2D_API GL2D_Vector2F GL2D_VecScalarSub(GL2D_Vector2F vector, float value) {
-    return (GL2D_Vector2F) { vector.x - value, vector.y - value };
+GL2D_API GL2D_Vector2f GL2D_VecScalarSub(GL2D_Vector2f vector, float value) {
+    return (GL2D_Vector2f) { vector.x - value, vector.y - value };
 }
 
-GL2D_API GL2D_Vector2F GL2D_VecScalarMult(GL2D_Vector2F vector, float value) {
-    return (GL2D_Vector2F) { vector.x * value, vector.y * value };
+GL2D_API GL2D_Vector2f GL2D_VecScalarMult(GL2D_Vector2f vector, float value) {
+    return (GL2D_Vector2f) { vector.x * value, vector.y * value };
 }
 
-GL2D_API GL2D_Vector2F GL2D_VecScalarDiv(GL2D_Vector2F vector, float value) {
-    return (GL2D_Vector2F) { vector.x / value, vector.y / value };
+GL2D_API GL2D_Vector2f GL2D_VecScalarDiv(GL2D_Vector2f vector, float value) {
+    return (GL2D_Vector2f) { vector.x / value, vector.y / value };
 }
 
-GL2D_API GL2D_Vector2F GL2D_VecPower(GL2D_Vector2F vector, float value) {
-    return (GL2D_Vector2F) { powf(vector.x, value), powf(vector.y, value) };
+GL2D_API GL2D_Vector2f GL2D_VecPower(GL2D_Vector2f vector, float value) {
+    return (GL2D_Vector2f) { powf(vector.x, value), powf(vector.y, value) };
 }
 
-GL2D_API GL2D_Vector2F GL2D_VecAdd(GL2D_Vector2F vector1, GL2D_Vector2F vector2) {
-    return (GL2D_Vector2F) { vector1.x + vector2.x, vector1.y + vector2.y };
+GL2D_API GL2D_Vector2f GL2D_VecAdd(GL2D_Vector2f vector1, GL2D_Vector2f vector2) {
+    return (GL2D_Vector2f) { vector1.x + vector2.x, vector1.y + vector2.y };
 }
 
-GL2D_API GL2D_Vector2F GL2D_VecSub(GL2D_Vector2F vector1, GL2D_Vector2F vector2) {
-    return (GL2D_Vector2F) { vector1.x - vector2.x, vector1.y - vector2.y };
+GL2D_API GL2D_Vector2f GL2D_VecSub(GL2D_Vector2f vector1, GL2D_Vector2f vector2) {
+    return (GL2D_Vector2f) { vector1.x - vector2.x, vector1.y - vector2.y };
 }
 
-GL2D_API GL2D_Vector2F GL2D_VecMult(GL2D_Vector2F vector1, GL2D_Vector2F vector2) {
-    return (GL2D_Vector2F) { vector1.x * vector2.x, vector1.y * vector2.y };
+GL2D_API GL2D_Vector2f GL2D_VecMult(GL2D_Vector2f vector1, GL2D_Vector2f vector2) {
+    return (GL2D_Vector2f) { vector1.x * vector2.x, vector1.y * vector2.y };
 }
 
-GL2D_API GL2D_Vector2F GL2D_VecDiv(GL2D_Vector2F vector1, GL2D_Vector2F vector2) {
-    return (GL2D_Vector2F) { vector1.x / vector2.x, vector1.y / vector2.y };
+GL2D_API GL2D_Vector2f GL2D_VecDiv(GL2D_Vector2f vector1, GL2D_Vector2f vector2) {
+    return (GL2D_Vector2f) { vector1.x / vector2.x, vector1.y / vector2.y };
 }
 
-GL2D_API float GL2D_VecDotProduct(GL2D_Vector2F vector1, GL2D_Vector2F vector2) {
+GL2D_API float GL2D_VecDotProduct(GL2D_Vector2f vector1, GL2D_Vector2f vector2) {
     return (vector1.x * vector2.x + vector1.y * vector2.y);
 }
 
-GL2D_API float GL2D_VecMagnitude(GL2D_Vector2F vector) {
+GL2D_API float GL2D_VecMagnitude(GL2D_Vector2f vector) {
     return sqrtf(GL2D_VecMagnitudeSquared(vector));
 }
 
-GL2D_API float GL2D_VecMagnitudeSquared(GL2D_Vector2F vector) {
+GL2D_API float GL2D_VecMagnitudeSquared(GL2D_Vector2f vector) {
     return (vector.x * vector.x + vector.y * vector.y);
 }
 
-GL2D_API GL2D_Vector2F GL2D_VecNormalize(GL2D_Vector2F vector) {
+GL2D_API GL2D_Vector2f GL2D_VecNormalize(GL2D_Vector2f vector) {
     float magnitude = GL2D_VecMagnitude(vector);
 
-    return (GL2D_Vector2F) { vector.x / magnitude, vector.y / magnitude };
+    return (GL2D_Vector2f) { vector.x / magnitude, vector.y / magnitude };
 }
 
-GL2D_API GL2D_Vector2F GL2D_VecRotate(GL2D_Vector2F vector, float angle) {
+GL2D_API GL2D_Vector2f GL2D_VecRotate(GL2D_Vector2f vector, float angle) {
     float radians = angle * (PI / 180);
     float radCos = cosf(radians);
     float radSine = sinf(radians);
 
-    return (GL2D_Vector2F) { vector.x * radCos - vector.y * radSine, vector.x * radSine + vector.y * radCos };
+    return (GL2D_Vector2f) { vector.x * radCos - vector.y * radSine, vector.x * radSine + vector.y * radCos };
 }
 
-GL2D_API void GL2D_Mat4InitIdentity(GL2D_Matrix4* matrix) {
-    matrix->data[0][0] = 1;    matrix->data[1][0] = 0;    matrix->data[2][0] = 0;    matrix->data[3][0] = 0;
-    matrix->data[0][1] = 0;    matrix->data[1][1] = 1;    matrix->data[2][1] = 0;    matrix->data[3][1] = 0;
-    matrix->data[0][2] = 0;    matrix->data[1][2] = 0;    matrix->data[2][2] = 1;    matrix->data[3][2] = 0;
-    matrix->data[0][3] = 0;    matrix->data[1][3] = 0;    matrix->data[2][3] = 0;    matrix->data[3][3] = 1;
+GL2D_API GL2D_Matrix4f GL2D_Mat4InitIdentity() {
+    GL2D_Matrix4f matrix;
+
+    matrix.data[0][0] = 1;    matrix.data[1][0] = 0;    matrix.data[2][0] = 0;    matrix.data[3][0] = 0;
+    matrix.data[0][1] = 0;    matrix.data[1][1] = 1;    matrix.data[2][1] = 0;    matrix.data[3][1] = 0;
+    matrix.data[0][2] = 0;    matrix.data[1][2] = 0;    matrix.data[2][2] = 1;    matrix.data[3][2] = 0;
+    matrix.data[0][3] = 0;    matrix.data[1][3] = 0;    matrix.data[2][3] = 0;    matrix.data[3][3] = 1;
+
+    return matrix;
 }
 
-GL2D_API void GL2D_Mat4InitTranslation(GL2D_Matrix4* matrix, GL2D_Vector2F vector) {
-    matrix->data[0][0] = 1;    matrix->data[1][0] = 0;    matrix->data[2][0] = 0;    matrix->data[3][0] = vector.x;
-    matrix->data[0][1] = 0;    matrix->data[1][1] = 1;    matrix->data[2][1] = 0;    matrix->data[3][1] = vector.y;
-    matrix->data[0][2] = 0;    matrix->data[1][2] = 0;    matrix->data[2][2] = 1;    matrix->data[3][2] = 1;
-    matrix->data[0][3] = 0;    matrix->data[1][3] = 0;    matrix->data[2][3] = 0;    matrix->data[3][3] = 1;
+GL2D_API GL2D_Matrix4f GL2D_Mat4Translate(GL2D_Matrix4f matrix, GL2D_Vector2f vector) {
+    GL2D_Matrix4f result = { 0 };
+
+    result.data[0][0] = 1;    result.data[1][0];        result.data[2][0];        result.data[3][0] = vector.x;
+    result.data[0][1];        result.data[1][1] = 1;    result.data[2][1];        result.data[3][1] = vector.y;
+    result.data[0][2];        result.data[1][2];        result.data[2][2] = 1;    result.data[3][2];
+    result.data[0][3];        result.data[1][3];        result.data[2][3];        result.data[3][3] = 1;
+
+    return GL2D_Mat4Mult(matrix, result);
 }
 
-GL2D_API void GL2D_Mat4InitScale(GL2D_Matrix4* matrix, GL2D_Vector2F vector) {
-    matrix->data[0][0] = vector.x;    matrix->data[1][0] = 0;           matrix->data[2][0] = 0;    matrix->data[3][0] = 0;
-    matrix->data[0][1] = 0;           matrix->data[1][1] = vector.y;    matrix->data[2][1] = 0;    matrix->data[3][1] = 0;
-    matrix->data[0][2] = 0;           matrix->data[1][2] = 0;           matrix->data[2][2] = 1;    matrix->data[3][2] = 0;
-    matrix->data[0][3] = 0;           matrix->data[1][3] = 0;           matrix->data[2][3] = 0;    matrix->data[3][3] = 1;
+GL2D_API GL2D_Matrix4f GL2D_Mat4Scale(GL2D_Matrix4f matrix, GL2D_Vector2f vector) {
+    GL2D_Matrix4f result = { 0 };
+
+    result.data[0][0] = vector.x;    result.data[1][0];               result.data[2][0];        result.data[3][0];
+    result.data[0][1];               result.data[1][1] = vector.y;    result.data[2][1];        result.data[3][1];
+    result.data[0][2];               result.data[1][2];               result.data[2][2] = 1;    result.data[3][2];
+    result.data[0][3];               result.data[1][3];               result.data[2][3];        result.data[3][3] = 1;
+
+    return GL2D_Mat4Mult(matrix, result);
 }
 
-GL2D_API void GL2D_Mat4InitRotation(GL2D_Matrix4* matrix, GL2D_Vector2F vector);
+//WTF DID I DO
+//FUCK YOU LEARN OPENGL
+GL2D_API GL2D_Matrix4f GL2D_Mat4Rotate(GL2D_Matrix4f matrix, float angle, GL2D_Vector2f vector) {
+    GL2D_Matrix4f result = { 0 };
+    float z = 0.5f;
+    float radians = angle * (PI / 180);
 
-GL2D_API GL2D_Matrix4 GL2D_Mat4Add(GL2D_Matrix4 matrix1, GL2D_Matrix4 matrix2) {
-    GL2D_Matrix4 result = { 0 };
+    float r00 = cosf(radians) + powf(vector.x, 2) * (1 - cosf(radians));
+    float r10 = vector.x * vector.y * (1 - cosf(radians)) - z * sinf(radians);
+    float r20 = vector.x * z * (1 - cosf(radians)) + vector.y * sinf(radians);
+    float r01 = vector.y * vector.y * (1 - cosf(radians)) + z * sinf(radians);
+    float r11 = cosf(radians) + powf(vector.y, 2) * (1 - cosf(radians));
+    float r21 = vector.y * z * (1 - cosf(radians)) - vector.x * sinf(radians);
+    float r02 = z * vector.x * (1 - cosf(radians)) - vector.y * sinf(radians);
+    float r12 = z * vector.y * (1 - cosf(radians)) + vector.x * sinf(radians);
+    float r22 = cosf(radians) + powf(z, 2) * (1 - cosf(radians));
+
+    result.data[0][0] = r00;    result.data[1][0] = r10;    result.data[2][0] = r20;    result.data[3][0];
+    result.data[0][1] = r01;    result.data[1][1] = r11;    result.data[2][1] = r21;    result.data[3][1];
+    result.data[0][2] = r02;    result.data[1][2] = r12;    result.data[2][2] = r22;    result.data[3][2];
+    result.data[0][3];          result.data[1][3];          result.data[2][3];          result.data[3][3] = 1;
+
+    return GL2D_Mat4Mult(matrix, result);
+}
+
+GL2D_API GL2D_Matrix4f GL2D_Mat4Add(GL2D_Matrix4f matrix1, GL2D_Matrix4f matrix2) {
+    GL2D_Matrix4f result = { 0 };
 
     for (uint32_t i = 0; i < 4; i++) {
         for (uint32_t j = 0; j < 4; j++) {
@@ -204,8 +224,8 @@ GL2D_API GL2D_Matrix4 GL2D_Mat4Add(GL2D_Matrix4 matrix1, GL2D_Matrix4 matrix2) {
     return result;
 }
 
-GL2D_API GL2D_Matrix4 GL2D_Mat4Sub(GL2D_Matrix4 matrix1, GL2D_Matrix4 matrix2) {
-    GL2D_Matrix4 result = { 0 };
+GL2D_API GL2D_Matrix4f GL2D_Mat4Sub(GL2D_Matrix4f matrix1, GL2D_Matrix4f matrix2) {
+    GL2D_Matrix4f result = { 0 };
 
     for (uint32_t i = 0; i < 4; i++) {
         for (uint32_t j = 0; j < 4; j++) {
@@ -216,12 +236,12 @@ GL2D_API GL2D_Matrix4 GL2D_Mat4Sub(GL2D_Matrix4 matrix1, GL2D_Matrix4 matrix2) {
     return result;
 }
 
-GL2D_API GL2D_Matrix4 GL2D_Mat4Mult(GL2D_Matrix4 matrix1, GL2D_Matrix4 matrix2) {
-    GL2D_Matrix4 result = { 0 };
+GL2D_API GL2D_Matrix4f GL2D_Mat4Mult(GL2D_Matrix4f matrix1, GL2D_Matrix4f matrix2) {
+    GL2D_Matrix4f result = { 0 };
 
     for (uint32_t i = 0; i < 4; i++) {
         for (uint32_t j = 0; j < 4; j++) {
-            result.data[j][i] = matrix1.data[0][j] * matrix2.data[i][0] +
+            result.data[i][j] = matrix1.data[0][j] * matrix2.data[i][0] +
                                 matrix1.data[1][j] * matrix2.data[i][1] +
                                 matrix1.data[2][j] * matrix2.data[i][2] +
                                 matrix1.data[3][j] * matrix2.data[i][3];
@@ -231,7 +251,7 @@ GL2D_API GL2D_Matrix4 GL2D_Mat4Mult(GL2D_Matrix4 matrix1, GL2D_Matrix4 matrix2) 
     return result;
 }
 
-GL2D_API GL2D_Vector2F GL2D_Mat4Vec2Mult(GL2D_Matrix4 matrix, GL2D_Vector2F vector) {
+GL2D_API GL2D_Vector2f GL2D_Mat4Vec2Mult(GL2D_Matrix4f matrix, GL2D_Vector2f vector) {
     float result[4] = { 0, 0, 0, 0 };
     float vec[4] = { vector.x, vector.y, 1, 1 };
 
@@ -241,12 +261,12 @@ GL2D_API GL2D_Vector2F GL2D_Mat4Vec2Mult(GL2D_Matrix4 matrix, GL2D_Vector2F vect
         }
     }
 
-    return (GL2D_Vector2F) { result[0], result[1] };
+    return (GL2D_Vector2f) { result[0], result[1] };
 }
 
-GL2D_API GL2D_Matrix4 GL2D_MatTransform(GL2D_Matrix4 matrix, GL2D_Vector2F vector);
-GL2D_API GL2D_Matrix4 GL2D_MatScale(GL2D_Matrix4 matrix, GL2D_Vector2F vector);
-GL2D_API GL2D_Matrix4 GL2D_MatRotate(GL2D_Matrix4 matrix, GL2D_Vector2F vector);
+GL2D_API GL2D_Matrix4f GL2D_MatTransform(GL2D_Matrix4f matrix, GL2D_Vector2f vector);
+GL2D_API GL2D_Matrix4f GL2D_MatScale(GL2D_Matrix4f matrix, GL2D_Vector2f vector);
+GL2D_API GL2D_Matrix4f GL2D_MatRotate(GL2D_Matrix4f matrix, GL2D_Vector2f vector);
 
 GL2D_API void GL2D_SetViewport(GL2D_Rect rect) {
     glViewport(rect.x, rect.y, rect.z, rect.w);
@@ -364,11 +384,11 @@ GL2D_API void GL2D_ShaderSetFloat(GL2D_Shader shader, const char* name, float va
     glUniform1f(glGetUniformLocation(shader->id, name), value);
 }
 
-GL2D_API void GL2D_ShaderSetVec2(GL2D_Shader shader, const char* name, GL2D_Vector2F value) {
+GL2D_API void GL2D_ShaderSetVec2(GL2D_Shader shader, const char* name, GL2D_Vector2f value) {
     glUniform2f(glGetUniformLocation(shader->id, name), value.x, value.y);
 }
 
-GL2D_API void GL2D_ShaderSetMat4(GL2D_Shader shader, const char* name, GL2D_Matrix4 value) {
+GL2D_API void GL2D_ShaderSetMat4(GL2D_Shader shader, const char* name, GL2D_Matrix4f value) {
     glUniformMatrix4fv(glGetUniformLocation(shader->id, name), 1, false, value.data);
 }
 

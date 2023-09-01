@@ -56,10 +56,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef struct GL2D_Vector2F {
+typedef struct GL2D_Vector2f {
     float x;
     float y;
-} GL2D_Vector2F;
+} GL2D_Vector2f;
 
 typedef struct GL2D_Rect {
     uint32_t x;
@@ -68,9 +68,15 @@ typedef struct GL2D_Rect {
     uint32_t w;
 } GL2D_Rect;
 
-typedef struct GL2D_Matrix4 {
+typedef struct GL2D_Transform {
+    GL2D_Vector2f position;
+    GL2D_Vector2f rotation;
+    GL2D_Vector2f scale;
+} GL2D_Transform;
+
+typedef struct GL2D_Matrix4f {
     float data[4][4];
-} GL2D_Matrix4;
+} GL2D_Matrix4f;
 
 typedef struct GL2D_Color {
     uint8_t r;
@@ -79,51 +85,78 @@ typedef struct GL2D_Color {
     uint8_t a;
 } GL2D_Color;
 
-extern const GL2D_Color
-GL2D_COLOR_GOODIE, GL2D_COLOR_GREY, GL2D_COLOR_DARK_GREY,
-GL2D_COLOR_VERY_DARK_GREY, GL2D_COLOR_RED, GL2D_COLOR_DARK_RED,
-GL2D_COLOR_VERY_DARK_RED, GL2D_COLOR_YELLOW, GL2D_COLOR_DARK_YELLOW,
-GL2D_COLOR_VERY_DARK_YELLOW, GL2D_COLOR_GREEN, GL2D_COLOR_DARK_GREEN,
-GL2D_COLOR_VERY_DARK_GREEN, GL2D_COLOR_CYAN, GL2D_COLOR_DARK_CYAN,
-GL2D_COLOR_VERY_DARK_CYAN, GL2D_COLOR_BLUE, GL2D_COLOR_DARK_BLUE,
-GL2D_COLOR_VERY_DARK_BLUE, GL2D_COLOR_MAGENTA, GL2D_COLOR_DARK_MAGENTA,
-GL2D_COLOR_VERY_DARK_MAGENTA, GL2D_COLOR_WHITE, GL2D_COLOR_BLACK,
-GL2D_COLOR_BLANK;
+#define GL2D_COLOR_GOODIE (GL2D_Color) { 51, 76, 76, 255 }
+#define GL2D_COLOR_GREY (GL2D_Color) { 192, 192, 192, 255 }
+#define GL2D_COLOR_DARK_GREY (GL2D_Color) { 128, 128, 128, 255 }
+#define GL2D_COLOR_VERY_DARK_GREY (GL2D_Color) { 64, 64, 64, 255 }
+#define GL2D_COLOR_RED (GL2D_Color) { 255, 0, 0, 255 }
+#define GL2D_COLOR_DARK_RED (GL2D_Color) { 128, 0, 0, 255 }
+#define GL2D_COLOR_VERY_DARK_RED (GL2D_Color) { 64, 0, 0, 255 }
+#define GL2D_COLOR_YELLOW (GL2D_Color) { 255, 255, 0, 255 }
+#define GL2D_COLOR_DARK_YELLOW (GL2D_Color) { 128, 128, 0, 255 }
+#define GL2D_COLOR_VERY_DARK_YELLOW (GL2D_Color) { 64, 64, 0, 255 }
+#define GL2D_COLOR_GREEN (GL2D_Color) { 0, 255, 0, 255 }
+#define GL2D_COLOR_DARK_GREEN (GL2D_Color) { 0, 128, 0, 255 }
+#define GL2D_COLOR_VERY_DARK_GREEN (GL2D_Color) { 0, 64, 0, 255 }
+#define GL2D_COLOR_CYAN (GL2D_Color) { 0, 255, 255, 255 }
+#define GL2D_COLOR_DARK_CYAN (GL2D_Color) { 0, 128, 128, 255 }
+#define GL2D_COLOR_VERY_DARK_CYAN (GL2D_Color) { 0, 64, 64, 255 }
+#define GL2D_COLOR_BLUE (GL2D_Color) { 0, 0, 255, 255 }
+#define GL2D_COLOR_DARK_BLUE (GL2D_Color) { 0, 0, 128, 255 }
+#define GL2D_COLOR_VERY_DARK_BLUE (GL2D_Color) { 0, 0, 64, 255 }
+#define GL2D_COLOR_MAGENTA (GL2D_Color) { 255, 0, 255, 255 }
+#define GL2D_COLOR_DARK_MAGENTA (GL2D_Color) { 128, 0, 128, 255 }
+#define GL2D_COLOR_VERY_DARK_MAGENTA (GL2D_Color) { 64, 0, 64, 255 }
+#define GL2D_COLOR_WHITE (GL2D_Color) { 255, 255, 255, 255 }
+#define GL2D_COLOR_BLACK (GL2D_Color) { 0, 0, 0, 255 }
+#define GL2D_COLOR_BLANK (GL2D_Color) { 0, 0, 0, 0 }
 
-typedef struct GL2D_Renderer *GL2D_Renderer;
-typedef struct GL2D_Shader *GL2D_Shader;
-typedef struct GL2D_Texture *GL2D_Texture;
-typedef struct GL2D_VertexArray *GL2D_VertexArray;
-typedef struct GL2D_VertexBuffer *GL2D_VertexBuffer;
-typedef struct GL2D_IndexBuffer *GL2D_IndexBuffer;
+//const static GL2D_Color
+//GL2D_COLOR_GOODIE = { 51, 76, 76, 255 }, GL2D_COLOR_GREY = { 192, 192, 192, 255 },
+//GL2D_COLOR_DARK_GREY = { 128, 128, 128, 255 }, GL2D_COLOR_VERY_DARK_GREY = { 64, 64, 64, 255 },
+//GL2D_COLOR_RED = { 255, 0, 0, 255 }, GL2D_COLOR_DARK_RED = { 128, 0, 0, 255 },
+//GL2D_COLOR_VERY_DARK_RED = { 64, 0, 0, 255 }, GL2D_COLOR_YELLOW = { 255, 255, 0, 255 },
+//GL2D_COLOR_DARK_YELLOW = { 128, 128, 0, 255 }, GL2D_COLOR_VERY_DARK_YELLOW = { 64, 64, 0, 255 },
+//GL2D_COLOR_GREEN = { 0, 255, 0, 255 }, GL2D_COLOR_DARK_GREEN = { 0, 128, 0, 255 },
+//GL2D_COLOR_VERY_DARK_GREEN = { 0, 64, 0, 255 }, GL2D_COLOR_CYAN = { 0, 255, 255, 255 },
+//GL2D_COLOR_DARK_CYAN = { 0, 128, 128, 255 }, GL2D_COLOR_VERY_DARK_CYAN = { 0, 64, 64, 255 },
+//GL2D_COLOR_BLUE = { 0, 0, 255, 255 }, GL2D_COLOR_DARK_BLUE = { 0, 0, 128, 255 },
+//GL2D_COLOR_VERY_DARK_BLUE = { 0, 0, 64, 255 }, GL2D_COLOR_MAGENTA = { 255, 0, 255, 255 },
+//GL2D_COLOR_DARK_MAGENTA = { 128, 0, 128, 255 }, GL2D_COLOR_VERY_DARK_MAGENTA = { 64, 0, 64, 255 },
+//GL2D_COLOR_WHITE = { 255, 255, 255, 255 }, GL2D_COLOR_BLACK = { 0, 0, 0, 255 },
+//GL2D_COLOR_BLANK = { 0, 0, 0, 0 };
 
-GL2D_API bool GL2D_VecEqual(GL2D_Vector2F vector1, GL2D_Vector2F vector2);
-GL2D_API GL2D_Vector2F GL2D_VecScalarAdd(GL2D_Vector2F vector, float value);
-GL2D_API GL2D_Vector2F GL2D_VecScalarSub(GL2D_Vector2F vector, float value);
-GL2D_API GL2D_Vector2F GL2D_VecScalarMult(GL2D_Vector2F vector, float value);
-GL2D_API GL2D_Vector2F GL2D_VecScalarDiv(GL2D_Vector2F vector, float value);
-GL2D_API GL2D_Vector2F GL2D_VecPower(GL2D_Vector2F vector, float value);
-GL2D_API GL2D_Vector2F GL2D_VecAdd(GL2D_Vector2F vector1, GL2D_Vector2F vector2);
-GL2D_API GL2D_Vector2F GL2D_VecSub(GL2D_Vector2F vector1, GL2D_Vector2F vector2);
-GL2D_API GL2D_Vector2F GL2D_VecMult(GL2D_Vector2F vector1, GL2D_Vector2F vector2);
-GL2D_API GL2D_Vector2F GL2D_VecDiv(GL2D_Vector2F vector1, GL2D_Vector2F vector2);
-GL2D_API float GL2D_VecDotProduct(GL2D_Vector2F vector1, GL2D_Vector2F vector2);
-GL2D_API float GL2D_VecMagnitude(GL2D_Vector2F vector);
-GL2D_API float GL2D_VecMagnitudeSquared(GL2D_Vector2F vector);
-GL2D_API GL2D_Vector2F GL2D_VecNormalize(GL2D_Vector2F vector);
-GL2D_API GL2D_Vector2F GL2D_VecRotate(GL2D_Vector2F vector, float angle);
+typedef struct GL2D_Renderer* GL2D_Renderer;
+typedef struct GL2D_Shader* GL2D_Shader;
+typedef struct GL2D_Texture* GL2D_Texture;
+typedef struct GL2D_VertexArray* GL2D_VertexArray;
+typedef struct GL2D_VertexBuffer* GL2D_VertexBuffer;
+typedef struct GL2D_IndexBuffer* GL2D_IndexBuffer;
 
-GL2D_API void GL2D_Mat4InitIdentity(GL2D_Matrix4* matrix);
-GL2D_API void GL2D_Mat4InitTranslation(GL2D_Matrix4* matrix, GL2D_Vector2F vector);
-GL2D_API void GL2D_Mat4InitScale(GL2D_Matrix4* matrix, GL2D_Vector2F vector);
-GL2D_API void GL2D_Mat4InitRotation(GL2D_Matrix4* matrix, GL2D_Vector2F vector);
-GL2D_API GL2D_Matrix4 GL2D_Mat4Add(GL2D_Matrix4 matrix1, GL2D_Matrix4 matrix2);
-GL2D_API GL2D_Matrix4 GL2D_Mat4Sub(GL2D_Matrix4 matrix1, GL2D_Matrix4 matrix2);
-GL2D_API GL2D_Matrix4 GL2D_Mat4Mult(GL2D_Matrix4 matrix1,GL2D_Matrix4 matrix2);
-GL2D_API GL2D_Vector2F GL2D_Mat4Vec2Mult(GL2D_Matrix4 matrix, GL2D_Vector2F vector);
-GL2D_API GL2D_Matrix4 GL2D_MatTransform(GL2D_Matrix4 matrix, GL2D_Vector2F vector);
-GL2D_API GL2D_Matrix4 GL2D_MatScale(GL2D_Matrix4 matrix, GL2D_Vector2F vector);
-GL2D_API GL2D_Matrix4 GL2D_MatRotate(GL2D_Matrix4 matrix, GL2D_Vector2F vector);
+GL2D_API bool GL2D_VecEqual(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
+GL2D_API GL2D_Vector2f GL2D_VecScalarAdd(GL2D_Vector2f vector, float value);
+GL2D_API GL2D_Vector2f GL2D_VecScalarSub(GL2D_Vector2f vector, float value);
+GL2D_API GL2D_Vector2f GL2D_VecScalarMult(GL2D_Vector2f vector, float value);
+GL2D_API GL2D_Vector2f GL2D_VecScalarDiv(GL2D_Vector2f vector, float value);
+GL2D_API GL2D_Vector2f GL2D_VecPower(GL2D_Vector2f vector, float value);
+GL2D_API GL2D_Vector2f GL2D_VecAdd(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
+GL2D_API GL2D_Vector2f GL2D_VecSub(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
+GL2D_API GL2D_Vector2f GL2D_VecMult(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
+GL2D_API GL2D_Vector2f GL2D_VecDiv(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
+GL2D_API float GL2D_VecDotProduct(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
+GL2D_API float GL2D_VecMagnitude(GL2D_Vector2f vector);
+GL2D_API float GL2D_VecMagnitudeSquared(GL2D_Vector2f vector);
+GL2D_API GL2D_Vector2f GL2D_VecNormalize(GL2D_Vector2f vector);
+GL2D_API GL2D_Vector2f GL2D_VecRotate(GL2D_Vector2f vector, float angle);
+
+GL2D_API GL2D_Matrix4f GL2D_Mat4InitIdentity();
+GL2D_API GL2D_Matrix4f GL2D_Mat4Translate(GL2D_Matrix4f matrix, GL2D_Vector2f vector);
+GL2D_API GL2D_Matrix4f GL2D_Mat4Scale(GL2D_Matrix4f matrix, GL2D_Vector2f vector);
+GL2D_API GL2D_Matrix4f GL2D_Mat4Rotate(GL2D_Matrix4f matrix, float angle, GL2D_Vector2f vector);
+GL2D_API GL2D_Matrix4f GL2D_Mat4Add(GL2D_Matrix4f matrix1, GL2D_Matrix4f matrix2);
+GL2D_API GL2D_Matrix4f GL2D_Mat4Sub(GL2D_Matrix4f matrix1, GL2D_Matrix4f matrix2);
+GL2D_API GL2D_Matrix4f GL2D_Mat4Mult(GL2D_Matrix4f matrix1,GL2D_Matrix4f matrix2);
+GL2D_API GL2D_Vector2f GL2D_Mat4Vec2Mult(GL2D_Matrix4f matrix, GL2D_Vector2f vector);
 
 GL2D_API void GL2D_SetViewport(GL2D_Rect rect);
 GL2D_API void GL2D_SetClearColor(GL2D_Color color);
@@ -137,8 +170,8 @@ GL2D_API void GL2D_BindShader(GL2D_Shader shader);
 GL2D_API void GL2D_ShaderSetBool(GL2D_Shader shader, const char* name, bool value);
 GL2D_API void GL2D_ShaderSetInt(GL2D_Shader shader, const char* name, int value);
 GL2D_API void GL2D_ShaderSetFloat(GL2D_Shader shader, const char* name, float value);
-GL2D_API void GL2D_ShaderSetVec2(GL2D_Shader shader, const char* name, GL2D_Vector2F value);
-GL2D_API void GL2D_ShaderSetMat4(GL2D_Shader shader, const char* name, GL2D_Matrix4 value);
+GL2D_API void GL2D_ShaderSetVec2(GL2D_Shader shader, const char* name, GL2D_Vector2f value);
+GL2D_API void GL2D_ShaderSetMat4(GL2D_Shader shader, const char* name, GL2D_Matrix4f value);
 
 GL2D_API GL2D_Texture GL2D_CreateTextureFromFile(const char* path);
 GL2D_API void GL2D_DestroyTexture(GL2D_Texture texture);

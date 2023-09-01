@@ -26,11 +26,12 @@ workspace "GL2D"
 
         includedirs {
             "%{prj.name}/src",
-            "%{prj.name}/external/%{cfg.system}"
+            "%{prj.name}/external/%{cfg.system}-%{cfg.architecture}"
         }
 
         links {
-            "Sandbox/external/%{cfg.system}/glad/glad",
+            "GL2D/external/%{cfg.system}-%{cfg.architecture}/glad/glad",
+            "GL2D/external/%{cfg.system}-%{cfg.architecture}/stb/stb_image",
         }
 
         filter "system:windows"
@@ -92,7 +93,6 @@ workspace "GL2D"
         links {
             "GL2D",
             "Sandbox/external/%{cfg.system}/glfw/glfw3",
-            "Sandbox/external/%{cfg.system}/glad/glad",
         }
 
         filter "system:windows"
