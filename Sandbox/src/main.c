@@ -97,32 +97,8 @@ int main() {
 
     GL2D_SetClearColor(GL2D_COLOR_GOODIE);
 
-    GL2D_Vector2F pos = { 0 };
-    GL2D_Matrix4 transform = { 0 };
-    GL2D_Mat4InitIdentity(&transform);
-
-    GL2D_Matrix4 mat1 = { 0 };
-
-    mat1.data[0][0] = 4;    mat1.data[1][0] = 5;    mat1.data[2][0] = 0;    mat1.data[3][0] = 0;
-    mat1.data[0][1] = 6;    mat1.data[1][1] = 7;    mat1.data[2][1] = 0;    mat1.data[3][1] = 0;
-    mat1.data[0][2] = 0;    mat1.data[1][2] = 0;    mat1.data[2][2] = 0;    mat1.data[3][2] = 0;
-    mat1.data[0][3] = 0;    mat1.data[1][3] = 0;    mat1.data[2][3] = 0;    mat1.data[3][3] = 0;
-
-    GL2D_Matrix4 mat2 = { 0 };
-
-    mat2.data[0][0] = 3;    mat2.data[1][0] = 2;    mat2.data[2][0] = 0;    mat2.data[3][0] = 0;
-    mat2.data[0][1] = 1;    mat2.data[1][1] = 0;    mat2.data[2][1] = 0;    mat2.data[3][1] = 0;
-    mat2.data[0][2] = 0;    mat2.data[1][2] = 0;    mat2.data[2][2] = 0;    mat2.data[3][2] = 0;
-    mat2.data[0][3] = 0;    mat2.data[1][3] = 0;    mat2.data[2][3] = 0;    mat2.data[3][3] = 0;
-
-    GL2D_Matrix4 result = GL2D_Mat4Mult(mat1, mat2);
-
-    for (uint32_t i = 0; i < 4; i++) {
-        for (uint32_t j = 0; j < 4; j++) {
-            printf("%f ", result.data[i][j]);
-        }
-        printf("\n");
-    }
+    GL2D_Transform trans = { 0 };
+    trans.scale = (GL2D_Vector2f) { 1, 1 };
 
     // render loop
     // -----------
@@ -134,18 +110,29 @@ int main() {
             glfwSetWindowShouldClose(window, 1);
         }
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-            pos.x += 0.001f;
+            trans.position.x += 0.001f;
         }
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-            pos.x -= 0.001f;
+            trans.position.x -= 0.001f;
         }
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-            pos.y += 0.001f;
+            trans.position.y += 0.001f;
         }
         if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-            pos.y -= 0.001f;
+            trans.position.y -= 0.001f;
         }
-
+        if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS) {
+            trans.scale.x = trans.scale.y += 0.001f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS) {
+            trans.scale.x = trans.scale.y -= 0.001f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS) {
+            trans.rotation.y -= 0.001f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS) {
+            trans.rotation.y += 0.001f;
+        }
         // render
         // ------
 
@@ -155,7 +142,24 @@ int main() {
         // render container
         GL2D_BindShader(shader);
 
+        GL2D_Matrix4f transform = GL2D_Mat4InitIdentity();
+        transform = GL2D_Mat4Scale(transform, trans.scale);
+        transform = GL2D_Mat4Translate(transform, trans.position);
+        transform = GL2D_Mat4Rotate(transform, 90.0f, trans.rotation);
         GL2D_ShaderSetMat4(shader, "transform", transform);
+
+        //printf("\n----------------------------------------------------\n");
+        //for (uint8_t i = 0; i < 4; i++) {
+        //    for (uint8_t j = 0; j < 4; j++) {
+        //        printf("%f", transform.data[j][i]);
+
+        //        if (j != 3) {
+        //            printf(", ");
+        //        }
+        //    }
+        //    printf("\n");
+        //}
+        //printf("\n----------------------------------------------------\n");
 
         GL2D_BindVertexArray(VAO);
 
