@@ -1,5 +1,7 @@
-#include <stb/stb_image.h>
+#include <time.h>
+#include <stdlib.h>
 #include <stdio.h>
+#include <stb/stb_image.h>
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
@@ -34,9 +36,16 @@ const char* fragmentShaderSource = "#version 330 core\n"
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+float RandomRange(float min, float max) {
+    float scale = rand() / (float)RAND_MAX; /* [0, 1.0] */
+    return min + scale * (max - min);      /* [min, max] */
+}
+
 int main() {
     // glfw: initialize and configure
     // ------------------------------
+    srand((uint32_t)time(NULL));
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -56,49 +65,24 @@ int main() {
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
-    GL2D_Renderer renderer = GL2D_CreateRenderer();
+    GL2D_Context renderer = GL2D_CreateContext();
+    //GL2D_MakeContextCurrent(renderer);
 
     // build and compile our shader zprogram
     // ------------------------------------
-    GL2D_Shader shader = GL2D_CreateShaderFromFiles("assets/vertex.shader", "assets/fragment.shader");
-
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    float vertices[] = {
-         // positions       // colors         // texture coords
-         0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, // top right
-         0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, // bottom right
-        -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // bottom left
-        -1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, // top left 
-    };
-
-    unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
-    };
-
-    GL2D_VertexArray VAO = GL2D_CreateVertexArray();
-    GL2D_VertexBuffer VBO = GL2D_CreateVertexBuffer(vertices, sizeof(vertices));
-    GL2D_IndexBuffer IBO = GL2D_CreateIndexBuffer(indices, sizeof(indices));
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    // texture coord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    // load and create a texture 
+ 
+    // load and create a texture s
     // -------------------------
     GL2D_Texture texture = GL2D_CreateTextureFromFile("assets/i.jpg");
 
     GL2D_SetClearColor(GL2D_COLOR_GOODIE);
+    
+    GL2D_Camera camera = { .position = GL2D_VECTOR2F(0, 0),
+        .projection = GL2D_PROJECTION_ORTHOGRAPHIC,
+        .orthographic = GL2D_ORTHOGRAPHIC_SPECS(GL2D_RECTF(-1.0f, 1.0f, -1.0f, 1.0f), 0.0f, 100.0f) };
 
-    GL2D_Transform trans = { 0 };
-    trans.scale = (GL2D_Vector2f) { 1, 1 };
+    GL2D_Rectf rect = GL2D_RECTF(0, -0.9999f, 0.3f, 0.3f);
+    GL2D_Rectf enemy = GL2D_RECTF(0, 1.0f, 0.4f, 0.4f);
 
     // render loop
     // -----------
@@ -110,61 +94,30 @@ int main() {
             glfwSetWindowShouldClose(window, 1);
         }
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-            trans.position.x += 0.001f;
+            rect.x += 0.005f;
         }
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-            trans.position.x -= 0.001f;
-        }
-        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-            trans.position.y += 0.001f;
-        }
-        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-            trans.position.y -= 0.001f;
-        }
-        if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS) {
-            trans.scale.x = trans.scale.y += 0.001f;
-        }
-        if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS) {
-            trans.scale.x = trans.scale.y -= 0.001f;
-        }
-        if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS) {
-            trans.rotation.y -= 0.001f;
-        }
-        if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS) {
-            trans.rotation.y += 0.001f;
+            rect.x -= 0.005f;
         }
         // render
         // ------
 
         // bind Texture
-        GL2D_BindTexture(texture);
 
         // render container
-        GL2D_BindShader(shader);
 
-        GL2D_Matrix4f transform = GL2D_Mat4InitIdentity();
-        transform = GL2D_Mat4Scale(transform, trans.scale);
-        transform = GL2D_Mat4Translate(transform, trans.position);
-        transform = GL2D_Mat4Rotate(transform, 90.0f, trans.rotation);
-        GL2D_ShaderSetMat4(shader, "transform", transform);
+        //GL2D_ShaderSetCamera(shader, "view", "projection", camera);
 
-        //printf("\n----------------------------------------------------\n");
-        //for (uint8_t i = 0; i < 4; i++) {
-        //    for (uint8_t j = 0; j < 4; j++) {
-        //        printf("%f", transform.data[j][i]);
+        if (enemy.y <= -0.9999f) {
+            enemy = GL2D_RECTF(RandomRange(-1, 1), 1.0f, 0.4f, 0.4f);
+        }
 
-        //        if (j != 3) {
-        //            printf(", ");
-        //        }
-        //    }
-        //    printf("\n");
-        //}
-        //printf("\n----------------------------------------------------\n");
+        enemy.y -= 0.004f;
 
-        GL2D_BindVertexArray(VAO);
+        GL2D_ClearContext();
 
-        GL2D_UpdateRenderer(renderer);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        GL2D_DrawTexture(texture, rect);
+        GL2D_DrawTexture(texture, enemy);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -174,11 +127,8 @@ int main() {
 
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-    GL2D_DestroyVertexArray(VAO);
-    GL2D_DestroyVertexBuffer(VBO);
-    GL2D_DestroyIndexBuffer(IBO);
-    GL2D_DestroyShader(shader);
     GL2D_DestroyTexture(texture);
+    GL2D_DestroyContext(renderer);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
@@ -192,5 +142,5 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
-    GL2D_SetViewport((GL2D_Rect){ 0, 0, width, height });
+    GL2D_SetViewport(GL2D_RECTF(0, 0, (float)width, (float)height));
 }

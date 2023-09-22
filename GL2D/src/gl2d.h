@@ -1,3 +1,31 @@
+﻿/*
+     ██████╗ ██╗     ██████╗ ██████╗
+    ██╔════╝ ██║     ╚════██╗██╔══██╗
+    ██║  ███╗██║      █████╔╝██║  ██║
+    ██║   ██║██║     ██╔═══╝ ██║  ██║
+    ╚██████╔╝███████╗███████╗██████╔╝
+     ╚═════╝ ╚══════╝╚══════╝╚═════╝
+
+    This Library Was Made by ABN ALSRAG
+    GL2D:
+
+    This software is provided 'as-is', without any express or implied
+    warranty.  In no event will the authors be held liable for any damages
+    arising from the use of this software.
+
+    Permission is granted to anyone to use this software for any purpose,
+    including commercial applications, and to alter it and redistribute it
+    freely, subject to the following restrictions:
+
+    1. The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+    2. Altered source versions must be plainly marked as such, and must not be
+        misrepresented as being the original software.
+    3. This notice may not be removed or altered from any source distribution.
+*/
+
 #ifndef _GL2D_H_
 #define _GL2D_H_
 
@@ -43,36 +71,34 @@
     #define GL2D_PLATFORM_ARM
 #endif
 
-#ifdef GL2D_USE_DLL
-    #ifdef GL2D_PLATFORM_WINDOWS
-        #define GL2D_API __declspec(dllimport)
-    #elif defined(GL2D_PLATFORM_GCC)
-        #define GL2D_API
-    #endif
-#else
-    #define GL2D_API
-#endif
-
 #include <stdint.h>
 #include <stdbool.h>
+
+#define GL2D_ARRAY(type, ...) ((type[]) { ##__VA_ARGS__ }), (sizeof((type[]){0, ##__VA_ARGS__})/sizeof(type)-1)
 
 typedef struct GL2D_Vector2f {
     float x;
     float y;
 } GL2D_Vector2f;
 
-typedef struct GL2D_Rect {
-    uint32_t x;
-    uint32_t y;
-    uint32_t z;
-    uint32_t w;
-} GL2D_Rect;
+#define GL2D_VECTOR2F(x, y) (GL2D_Vector2f) { x, y }
+
+typedef struct GL2D_Rectf {
+    float x;
+    float y;
+    float width;
+    float height;
+} GL2D_Rectf;
+
+#define GL2D_RECTF(x, y, width, height) (GL2D_Rectf) { x, y, width, height }
 
 typedef struct GL2D_Transform {
     GL2D_Vector2f position;
-    GL2D_Vector2f rotation;
+    float rotation;
     GL2D_Vector2f scale;
 } GL2D_Transform;
+
+#define GL2D_TRANSFORM(p, r, s) (GL2D_Transform) { .position = p, .rotation = r, .scale = s }
 
 typedef struct GL2D_Matrix4f {
     float data[4][4];
@@ -84,6 +110,8 @@ typedef struct GL2D_Color {
     uint8_t b;
     uint8_t a;
 } GL2D_Color;
+
+#define GL2D_COLOR(r, g, b, a) (GL2D_Color) { r, g, b, a }
 
 #define GL2D_COLOR_GOODIE (GL2D_Color) { 51, 76, 76, 255 }
 #define GL2D_COLOR_GREY (GL2D_Color) { 192, 192, 192, 255 }
@@ -111,82 +139,122 @@ typedef struct GL2D_Color {
 #define GL2D_COLOR_BLACK (GL2D_Color) { 0, 0, 0, 255 }
 #define GL2D_COLOR_BLANK (GL2D_Color) { 0, 0, 0, 0 }
 
-//const static GL2D_Color
-//GL2D_COLOR_GOODIE = { 51, 76, 76, 255 }, GL2D_COLOR_GREY = { 192, 192, 192, 255 },
-//GL2D_COLOR_DARK_GREY = { 128, 128, 128, 255 }, GL2D_COLOR_VERY_DARK_GREY = { 64, 64, 64, 255 },
-//GL2D_COLOR_RED = { 255, 0, 0, 255 }, GL2D_COLOR_DARK_RED = { 128, 0, 0, 255 },
-//GL2D_COLOR_VERY_DARK_RED = { 64, 0, 0, 255 }, GL2D_COLOR_YELLOW = { 255, 255, 0, 255 },
-//GL2D_COLOR_DARK_YELLOW = { 128, 128, 0, 255 }, GL2D_COLOR_VERY_DARK_YELLOW = { 64, 64, 0, 255 },
-//GL2D_COLOR_GREEN = { 0, 255, 0, 255 }, GL2D_COLOR_DARK_GREEN = { 0, 128, 0, 255 },
-//GL2D_COLOR_VERY_DARK_GREEN = { 0, 64, 0, 255 }, GL2D_COLOR_CYAN = { 0, 255, 255, 255 },
-//GL2D_COLOR_DARK_CYAN = { 0, 128, 128, 255 }, GL2D_COLOR_VERY_DARK_CYAN = { 0, 64, 64, 255 },
-//GL2D_COLOR_BLUE = { 0, 0, 255, 255 }, GL2D_COLOR_DARK_BLUE = { 0, 0, 128, 255 },
-//GL2D_COLOR_VERY_DARK_BLUE = { 0, 0, 64, 255 }, GL2D_COLOR_MAGENTA = { 255, 0, 255, 255 },
-//GL2D_COLOR_DARK_MAGENTA = { 128, 0, 128, 255 }, GL2D_COLOR_VERY_DARK_MAGENTA = { 64, 0, 64, 255 },
-//GL2D_COLOR_WHITE = { 255, 255, 255, 255 }, GL2D_COLOR_BLACK = { 0, 0, 0, 255 },
-//GL2D_COLOR_BLANK = { 0, 0, 0, 0 };
+typedef enum GL2D_TextureFileType {
+    GL2D_FILE_TGA,
+} GL2D_TextureFileType;
 
-typedef struct GL2D_Renderer* GL2D_Renderer;
+typedef struct GL2D_Context* GL2D_Context;
+
+typedef enum GL2D_Projection {
+    GL2D_PROJECTION_ORTHOGRAPHIC,
+    GL2D_PROJECTION_PERSPECTIVE,
+} GL2D_Projection;
+
+typedef struct GL2D_OrthographicSpecs {
+    GL2D_Rectf size;
+    float near;
+    float far;
+} GL2D_OrthographicSpecs;
+
+#define GL2D_ORTHOGRAPHIC_SPECS(s, n, f) (GL2D_OrthographicSpecs) { .size = s, .near = n, .far = f }
+
+typedef struct GL2D_PerspectiveSpecs {
+    float fov;
+    float aspect;
+    float near;
+    float far;
+} GL2D_PerspectiveSpecs;
+
+#define GL2D_PERSPECTIVE_SPECS(fo, a, n, f) (GL2D_PerspectiveSpecs) { .fov = fo, .aspect = a, .near = n, .far = f }
+
+typedef struct GL2D_Camera {
+    GL2D_Vector2f position;
+    GL2D_Projection projection;
+    union {
+        GL2D_OrthographicSpecs orthographic;
+        GL2D_PerspectiveSpecs perspective;
+    };
+} GL2D_Camera;
+
+#define GL2D_ORTHOGRAPHIC_CAMERA(pos, ortho) (GL2D_Camera) { .position = pos,                           \
+                                                             .projection = GL2D_PROJECTION_ORTHOGRAPHIC,\
+                                                             .orthographic = ortho }
+
+#define GL2D_PERSPECTIVE_CAMERA(pos, pers) (GL2D_Camera) { .position = pos,                           \
+                                                           .projection = GL2D_PROJECTION_PERSPECTIVE, \
+                                                           .perspective = pers }
+
 typedef struct GL2D_Shader* GL2D_Shader;
 typedef struct GL2D_Texture* GL2D_Texture;
 typedef struct GL2D_VertexArray* GL2D_VertexArray;
 typedef struct GL2D_VertexBuffer* GL2D_VertexBuffer;
 typedef struct GL2D_IndexBuffer* GL2D_IndexBuffer;
 
-GL2D_API bool GL2D_VecEqual(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
-GL2D_API GL2D_Vector2f GL2D_VecScalarAdd(GL2D_Vector2f vector, float value);
-GL2D_API GL2D_Vector2f GL2D_VecScalarSub(GL2D_Vector2f vector, float value);
-GL2D_API GL2D_Vector2f GL2D_VecScalarMult(GL2D_Vector2f vector, float value);
-GL2D_API GL2D_Vector2f GL2D_VecScalarDiv(GL2D_Vector2f vector, float value);
-GL2D_API GL2D_Vector2f GL2D_VecPower(GL2D_Vector2f vector, float value);
-GL2D_API GL2D_Vector2f GL2D_VecAdd(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
-GL2D_API GL2D_Vector2f GL2D_VecSub(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
-GL2D_API GL2D_Vector2f GL2D_VecMult(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
-GL2D_API GL2D_Vector2f GL2D_VecDiv(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
-GL2D_API float GL2D_VecDotProduct(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
-GL2D_API float GL2D_VecMagnitude(GL2D_Vector2f vector);
-GL2D_API float GL2D_VecMagnitudeSquared(GL2D_Vector2f vector);
-GL2D_API GL2D_Vector2f GL2D_VecNormalize(GL2D_Vector2f vector);
-GL2D_API GL2D_Vector2f GL2D_VecRotate(GL2D_Vector2f vector, float angle);
+bool GL2D_Vec2Equal(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
+GL2D_Vector2f GL2D_Vec2ScalarAdd(GL2D_Vector2f vector, float value);
+GL2D_Vector2f GL2D_Vec2ScalarSub(GL2D_Vector2f vector, float value);
+GL2D_Vector2f GL2D_Vec2ScalarMult(GL2D_Vector2f vector, float value);
+GL2D_Vector2f GL2D_Vec2ScalarDiv(GL2D_Vector2f vector, float value);
+GL2D_Vector2f GL2D_Vec2Power(GL2D_Vector2f vector, float value);
+GL2D_Vector2f GL2D_Vec2Add(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
+GL2D_Vector2f GL2D_Vec2Sub(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
+GL2D_Vector2f GL2D_Vec2Mult(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
+GL2D_Vector2f GL2D_Vec2Div(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
+float GL2D_Vec2DotProduct(GL2D_Vector2f vector1, GL2D_Vector2f vector2);
+float GL2D_Vec2Magnitude(GL2D_Vector2f vector);
+float GL2D_Vec2MagnitudeSquared(GL2D_Vector2f vector);
+GL2D_Vector2f GL2D_Vec2Normalize(GL2D_Vector2f vector);
+GL2D_Vector2f GL2D_Vec2Rotate(GL2D_Vector2f vector, float angle);
 
-GL2D_API GL2D_Matrix4f GL2D_Mat4InitIdentity();
-GL2D_API GL2D_Matrix4f GL2D_Mat4Translate(GL2D_Matrix4f matrix, GL2D_Vector2f vector);
-GL2D_API GL2D_Matrix4f GL2D_Mat4Scale(GL2D_Matrix4f matrix, GL2D_Vector2f vector);
-GL2D_API GL2D_Matrix4f GL2D_Mat4Rotate(GL2D_Matrix4f matrix, float angle, GL2D_Vector2f vector);
-GL2D_API GL2D_Matrix4f GL2D_Mat4Add(GL2D_Matrix4f matrix1, GL2D_Matrix4f matrix2);
-GL2D_API GL2D_Matrix4f GL2D_Mat4Sub(GL2D_Matrix4f matrix1, GL2D_Matrix4f matrix2);
-GL2D_API GL2D_Matrix4f GL2D_Mat4Mult(GL2D_Matrix4f matrix1,GL2D_Matrix4f matrix2);
-GL2D_API GL2D_Vector2f GL2D_Mat4Vec2Mult(GL2D_Matrix4f matrix, GL2D_Vector2f vector);
+GL2D_Matrix4f GL2D_Mat4Identity();
+GL2D_Matrix4f GL2D_Mat4Ortho(float left, float right, float bottom, float top, float near, float far);
+GL2D_Matrix4f GL2D_Mat4Perspective(float fov, float aspect, float near, float far);
+GL2D_Matrix4f GL2D_Mat4Translate(GL2D_Matrix4f matrix, GL2D_Vector2f vector, float z);
+GL2D_Matrix4f GL2D_Mat4Scale(GL2D_Matrix4f matrix, GL2D_Vector2f vector);
+GL2D_Matrix4f GL2D_Mat4Rotate(GL2D_Matrix4f matrix, float angle);
+GL2D_Matrix4f GL2D_Mat4Add(GL2D_Matrix4f matrix1, GL2D_Matrix4f matrix2);
+GL2D_Matrix4f GL2D_Mat4Sub(GL2D_Matrix4f matrix1, GL2D_Matrix4f matrix2);
+GL2D_Matrix4f GL2D_Mat4Mult(GL2D_Matrix4f matrix1,GL2D_Matrix4f matrix2);
+GL2D_Vector2f GL2D_Mat4Vec2Mult(GL2D_Matrix4f matrix, GL2D_Vector2f vector);
 
-GL2D_API void GL2D_SetViewport(GL2D_Rect rect);
-GL2D_API void GL2D_SetClearColor(GL2D_Color color);
+void GL2D_SetViewport(GL2D_Rectf rect);
+void GL2D_SetClearColor(GL2D_Color color);
 
-GL2D_API GL2D_Renderer GL2D_CreateRenderer();
-GL2D_API void GL2D_UpdateRenderer(GL2D_Renderer renderer);
+GL2D_Context GL2D_CreateContext();
+void GL2D_DestroyContext(GL2D_Context context);
+void GL2D_SetContextCurrent(GL2D_Context context);
+void GL2D_ClearContext();
 
-GL2D_API GL2D_Shader GL2D_CreateShaderFromFiles(const char* vertexPath, const char* fragmentPath);
-GL2D_API void GL2D_DestroyShader(GL2D_Shader shader);
-GL2D_API void GL2D_BindShader(GL2D_Shader shader);
-GL2D_API void GL2D_ShaderSetBool(GL2D_Shader shader, const char* name, bool value);
-GL2D_API void GL2D_ShaderSetInt(GL2D_Shader shader, const char* name, int value);
-GL2D_API void GL2D_ShaderSetFloat(GL2D_Shader shader, const char* name, float value);
-GL2D_API void GL2D_ShaderSetVec2(GL2D_Shader shader, const char* name, GL2D_Vector2f value);
-GL2D_API void GL2D_ShaderSetMat4(GL2D_Shader shader, const char* name, GL2D_Matrix4f value);
+void GL2D_DrawTexture(GL2D_Texture texture, GL2D_Rectf rect);
 
-GL2D_API GL2D_Texture GL2D_CreateTextureFromFile(const char* path);
-GL2D_API void GL2D_DestroyTexture(GL2D_Texture texture);
-GL2D_API void GL2D_BindTexture(GL2D_Texture texture);
+GL2D_Matrix4f GL2D_CamComputeView(GL2D_Camera camera);
+GL2D_Matrix4f GL2D_CamComputeProjection(GL2D_Camera camera);
 
-GL2D_API GL2D_VertexArray GL2D_CreateVertexArray();
-GL2D_API void GL2D_DestroyVertexArray(GL2D_VertexArray vao);
-GL2D_API void GL2D_BindVertexArray(GL2D_VertexArray vao);
+GL2D_Shader GL2D_CreateShaderFromFiles(const char* vertexPath, const char* fragmentPath);
+GL2D_Shader GL2D_CreateShaderFromStrings(const char* vertexSource, const char* fragmentSource);
+void GL2D_DestroyShader(GL2D_Shader shader);
+void GL2D_BindShader(GL2D_Shader shader);
+void GL2D_ShaderSetBool(GL2D_Shader shader, const char* name, bool value);
+void GL2D_ShaderSetInt(GL2D_Shader shader, const char* name, int value);
+void GL2D_ShaderSetFloat(GL2D_Shader shader, const char* name, float value);
+void GL2D_ShaderSetVec2(GL2D_Shader shader, const char* name, GL2D_Vector2f value);
+void GL2D_ShaderSetMat4(GL2D_Shader shader, const char* name, GL2D_Matrix4f value);
+void GL2D_ShaderSetCamera(GL2D_Shader shader, const char* view, const char* projection, GL2D_Camera camera);
 
-GL2D_API GL2D_VertexBuffer GL2D_CreateVertexBuffer(const float* vertices, uint64_t size);
-GL2D_API void GL2D_DestroyVertexBuffer(GL2D_VertexBuffer vbo);
-GL2D_API void GL2D_BindVertexBuffer(GL2D_VertexBuffer vbo);
+GL2D_Texture GL2D_CreateTextureFromFile(const char* path);
+void GL2D_DestroyTexture(GL2D_Texture texture);
+void GL2D_BindTexture(GL2D_Texture texture);
 
-GL2D_API GL2D_IndexBuffer GL2D_CreateIndexBuffer(const uint32_t* indices, uint64_t size);
-GL2D_API void GL2D_DestroyIndexBuffer(GL2D_IndexBuffer ibo);
-GL2D_API void GL2D_BindIndexBuffer(GL2D_IndexBuffer ibo);
+GL2D_VertexArray GL2D_CreateVertexArray();
+void GL2D_DestroyVertexArray(GL2D_VertexArray vao);
+void GL2D_BindVertexArray(GL2D_VertexArray vao);
+
+GL2D_VertexBuffer GL2D_CreateVertexBuffer(const float* vertices, uint64_t size);
+void GL2D_DestroyVertexBuffer(GL2D_VertexBuffer vbo);
+void GL2D_BindVertexBuffer(GL2D_VertexBuffer vbo);
+
+GL2D_IndexBuffer GL2D_CreateIndexBuffer(const uint32_t* indices, uint64_t size);
+void GL2D_DestroyIndexBuffer(GL2D_IndexBuffer ibo);
+void GL2D_BindIndexBuffer(GL2D_IndexBuffer ibo);
 
 #endif
